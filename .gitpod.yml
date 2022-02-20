@@ -1,0 +1,22 @@
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: true
+    addComment: true
+    addBadge: true
+
+tasks:
+  - before: brew install faas
+    init: npm ci
+
+ports: []
+
+vscode:
+  extensions:
+    - docker
+    - donjayamanne.githistory
+    - EditorConfig.EditorConfig
+    - esbenp.prettier-vscode

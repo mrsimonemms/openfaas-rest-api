@@ -1,0 +1,11 @@
+.husky/_
+dist
+tmp
+.vscode
+.idea
+node_modules
+*.log*
+.envrc*
+.DS_Store
+Thumbs.db
+charts/*/charts
