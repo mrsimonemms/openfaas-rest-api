@@ -2,4 +2,13 @@ version: 1.0
 provider:
   name: openfaas
   gateway: http://127.0.0.1:8080
-functions: {}
+functions:
+  product:
+    lang: mongoose-crud
+    handler: ./components/product
+    image: product:latest
+  product-size:
+    lang: mongoose-crud
+    handler: ./components/product-size
+    image: product-size:latest
+
