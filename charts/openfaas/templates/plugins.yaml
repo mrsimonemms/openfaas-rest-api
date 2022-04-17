@@ -1,0 +1,9 @@
+{{ range .Values.plugins }}
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: {{ .name }}
+plugin: {{ .plugin }}
+config: {{ .config | toYaml | nindent 2 }}
+{{- end }}

@@ -1,0 +1,71 @@
+database:
+  mongodb:
+    url: "mongodb://openfaas-mongodb.openfaas.svc.cluster.local:27017/openfaas"
+
+dataIngester:
+  enabled: false
+  image:
+    repository: registry.gitlab.com/mrsimonemms/data-ingester
+    tag: 1.0.0
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+
+mongodb:
+  enabled: true
+  auth:
+    enabled: false
+  persistence:
+    enabled: false
+
+plugins:
+  - name: product-request-transformer
+    plugin: request-transformer
+    config:
+      remove:
+        body:
+          - productId
+      add:
+        body:
+          - productId:$(uri_captures["productId"])
+      append:
+        querystring:
+          - filter:productId||$eq||$(uri_captures["productId"])
+
+services:
+  - name: product-gateway
+    annotations:
+      konghq.com/path: /function/product/crud
+  - name: product-size-gateway
+    annotations:
+      konghq.com/path: /function/productsize/crud
+      konghq.com/plugins: product-request-transformer
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Dependent services
+
+kong:
+  enabled: true
+  proxy:
+    http:
+      servicePort: 9999
+    tls:
+      enabled: false
+
+openfaas:
+  enabled: true
+  functionNamespace: openfaas-fn
+  generateBasicAuth: true
+  openfaasPRO: false
+  operator:
+    create: true
+  serviceType: LoadBalancer

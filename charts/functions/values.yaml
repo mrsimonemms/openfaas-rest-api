@@ -1,0 +1,20 @@
+# Default values for openfaas.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+functions:
+  product:
+    image:
+      repository: ghcr.io/mrsimonemms/openfaas-rest-api/product
+      tag: latest
+    envvars:
+      LOGGER_LEVEL: info
+      MONGODB_URL: "mongodb://openfaas-mongodb.openfaas.svc.cluster.local:27017/openfaas"
+
+  productSize:
+    image:
+      repository: ghcr.io/mrsimonemms/openfaas-rest-api/product-size
+      tag: latest
+    envvars:
+      LOGGER_LEVEL: info
+      MONGODB_URL: "mongodb://openfaas-mongodb.openfaas.svc.cluster.local:27017/openfaas"

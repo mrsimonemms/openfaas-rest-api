@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openfaas
+  annotations:
+    konghq.com/strip-path: "true"
+spec:
+  ingressClassName: kong
+  rules:
+    - http:
+        paths:
+          - path: /api/v1/product/(?<productId>[\w-]+)/size
+            pathType: Prefix
+            backend:
+              service:
+                name: product-size-gateway
+                port:
+                  name: http
+          - path: /api/v1/product
+            pathType: Prefix
+            backend:
+              service:
+                name: product-gateway
+                port:
+                  name: http

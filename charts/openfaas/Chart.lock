@@ -1,0 +1,12 @@
+dependencies:
+- name: kong
+  repository: https://charts.konghq.com
+  version: 2.8.0
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.31.5
+- name: openfaas
+  repository: https://openfaas.github.io/faas-netes
+  version: 9.0.2
+digest: sha256:b0e9c083f0a4f6d3f8eb72f92eb8d94c38f081dcf72a8dd8a9be696824b69806
+generated: "2022-04-17T20:50:43.004720636+01:00"

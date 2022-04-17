@@ -1,0 +1,70 @@
+{{- if .Values.dataIngester.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-ingester-mongodb
+  labels:
+    {{- include "openfaas.labels" . | nindent 4 }}
+data:
+{{ range $path, $_ := .Files.Glob "data/mongodb/*.{js,json}" }}
+  {{- base $path | quote | indent 2 }}: |- {{ $.Files.Get $path | nindent 4 }}
+{{ end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-ingester-mongodb
+  labels:
+    {{- include "openfaas.labels" . | nindent 4 }}
+    app: data-ingester-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "openfaas.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "openfaas.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "openfaas.serviceAccountName" . }}
+      volumes:
+        - name: data-ingester-mongodb
+          configMap:
+            name: data-ingester-mongodb
+      containers:
+        - name: data-ingester
+          image: "{{ .Values.dataIngester.image.repository }}:{{ .Values.dataIngester.image.tag }}"
+          imagePullPolicy: {{ .Values.dataIngester.image.pullPolicy }}
+          env:
+            - name: DATA_DIR
+              value: /data
+            - name: DB_TYPE
+              value: mongodb
+            - name: MONGODB_URL
+              value: {{ .Values.database.mongodb.url }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: data-ingester-mongodb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-ingester-mongodb
+  labels:
+    {{- include "openfaas.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.dataIngester.service.type }}
+  ports:
+    - port: {{ .Values.dataIngester.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: data-ingester-mongodb
+{{- end }}

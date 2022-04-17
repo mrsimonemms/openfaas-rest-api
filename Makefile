@@ -36,6 +36,10 @@ install:
 		cd $$template; \
 		npm ci; \
 	done
+
+	for chart in ./charts/*; do \
+		helm dependency update $$chart; \
+  	done
 .PHONY: install
 
 new:

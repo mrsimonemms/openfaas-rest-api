@@ -1,0 +1,18 @@
+apiVersion: v2
+name: openfaas
+description: Build a RESTful API out of OpenFaaS functions
+type: application
+version: 0.0.0
+dependencies:
+  - name: kong
+    version: "^2.8.0"
+    repository: https://charts.konghq.com
+    condition: kong.enabled
+  - name: mongodb
+    version: "^10.30.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: mongodb.enabled
+  - name: openfaas
+    version: "^9.0.2"
+    repository: https://openfaas.github.io/faas-netes
+    condition: openfaas.enabled
