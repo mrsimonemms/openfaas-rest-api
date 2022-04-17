@@ -1,0 +1,49 @@
+apiVersion: skaffold/v2beta26
+kind: Config
+metadata:
+  name: openfaas
+build:
+  tagPolicy:
+    dateTime: {}
+  local:
+    push: true
+    useDockerCLI: true
+    tryImportMissing: true
+  artifacts:
+    - image: ghcr.io/mrsimonemms/openfaas-rest-api/product
+      custom:
+        buildCommand: bash ./scripts/skaffoldBuildFunction.sh product
+        dependencies:
+          paths:
+            - 'components/product/**/*'
+    - image: ghcr.io/mrsimonemms/openfaas-rest-api/product-size
+      custom:
+        buildCommand: bash ./scripts/skaffoldBuildFunction.sh product-size
+        dependencies:
+          paths:
+            - 'components/product-size/**/*'
+deploy:
+  helm:
+    releases:
+      - name: openfaas
+        namespace: openfaas
+        createNamespace: false
+        chartPath: ./charts/openfaas
+        wait: true
+        skipBuildDependencies: true
+        setValues:
+          'dataIngester.enabled': true
+          'mongodb.service.type': LoadBalancer
+      - name: functions
+        namespace: openfaas-fn
+        chartPath: ./charts/functions
+        wait: true
+        skipBuildDependencies: true
+        imageStrategy:
+          helm: {}
+        artifactOverrides:
+          functions:
+            product:
+              image: ghcr.io/mrsimonemms/openfaas-rest-api/product
+            productSize:
+              image: ghcr.io/mrsimonemms/openfaas-rest-api/product-size

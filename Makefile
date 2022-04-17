@@ -3,7 +3,7 @@ LICENSE = AGPL-3.0
 FUNC_FILE ?= './functions.yaml'
 K3D_CONFIG ?= './k3d.config.yaml'
 
-all: deps destroy templates install provision
+all: deps destroy templates install provision serve
 
 define check_dependency
 	@which $(1) > /dev/null || (echo "$(1) not installed - see $(2) to install" && exit 1)
@@ -16,6 +16,7 @@ deps:
 	$(call check_dependency,jq,https://stedolan.github.io/jq/download/)
 	$(call check_dependency,k3d,"https://k3d.io/#installation")
 	$(call check_dependency,kubectl,https://kubernetes.io/docs/tasks/tools)
+	$(call check_dependency,skaffold,https://skaffold.dev/docs/install)
 
 	@echo "All dependencies are available"
 .PHONY: deps
@@ -83,6 +84,10 @@ provision:
 	skaffold config set default-repo registry.localhost:5000
 	kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
 .PHONY: provision
+
+serve:
+	skaffold dev
+.PHONY: serve
 
 templates:
 	faas template pull https://gitlab.com/MrSimonEmms/openfaas-templates
